@@ -117,6 +117,7 @@ vars.Add(PathVariable('_includedir',
                       'Directory to install development headers',
                       '${PREFIX}/include',
                       PathVariable.PathAccept))
+vars.Add('optflags', 'optimization flags', '')
 
 env = Environment(BUILDERS = {'GPerf': gperf},
                   variables = vars)
@@ -179,6 +180,7 @@ env.ParseConfig('pkg-config --cflags --libs tokyocabinet')
 env.ParseConfig('pkg-config --cflags --libs libpcre')
 env.ParseConfig('pkg-config --cflags --libs libevent')
 env.Append(LIBS=['dl'])
+env.Append(**env.ParseFlags(env['optflags']))
 
 platform = env.backtick('uname -o 2>/dev/null || uname -s').replace('/', '')
 env.Append(CCFLAGS = '-DPLATFORM_%s' % platform)
