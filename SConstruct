@@ -113,6 +113,14 @@ vars.Add(PathVariable('_libdir',
                       'Directory to install shared library',
                       '${PREFIX}/lib',
                       PathVariable.PathAccept))
+vars.Add(PathVariable('_datadir',
+                      'Directory to install shared data',
+                      '${PREFIX}/share',
+                      PathVariable.PathAccept))
+vars.Add(PathVariable('_mandir',
+                      'Directory to install manual pages',
+                      '${PREFIX}/share/man',
+                      PathVariable.PathAccept))
 vars.Add(PathVariable('_includedir',
                       'Directory to install development headers',
                       '${PREFIX}/include',
@@ -244,9 +252,11 @@ env.Install('${DESTDIR}${_includedir}', ['grok.h',
                                          'grok_discover.h',
                                          grok_version_h])
 
-env.Install('${DESTDIR}${PREFIX}/share/grok/patterns', 'patterns/base')
+env.Install('${DESTDIR}${_datadir}/grok/patterns', 'patterns/base')
+env.Install('${DESTDIR}${_mandir}/man1', 'grok.1')
 
 env.Alias('install', '${DESTDIR}${_bindir}')
 env.Alias('install', '${DESTDIR}${_includedir}')
 env.Alias('install', '${DESTDIR}${_libdir}')
-env.Alias('install', '${DESTDIR}${PREFIX}/share/grok/patterns')
+env.Alias('install', '${DESTDIR}${_datadir}/grok/patterns')
+env.Alias('install', '${DESTDIR}${_mandir}/man1')
