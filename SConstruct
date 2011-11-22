@@ -242,6 +242,9 @@ env.Install('${DESTDIR}${_includedir}', ['grok.h',
                                          'grok_discover.h',
                                          grok_version_h])
 
+env.Install('${DESTDIR}${PREFIX}/share/grok/patterns', 'patterns/base')
+
 env.Alias('install', '${DESTDIR}${_bindir}')
 env.Alias('install', '${DESTDIR}${_includedir}')
 env.Alias('install', '${DESTDIR}${_libdir}')
+env.Alias('install', '${DESTDIR}${PREFIX}/share/grok/patterns')
