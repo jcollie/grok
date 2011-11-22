@@ -1,4 +1,4 @@
-#include <grok.h>
+#include "grok.h"
 #include "stringhelper.h"
 
 static int dgrok_init = 0;
