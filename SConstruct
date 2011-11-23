@@ -7,6 +7,10 @@ gperf = Builder(action = 'gperf $SOURCE > $TARGET',
                 suffix = '.c',
                 src_suffix = '.gperf')
 
+pod2man = Builder(action = 'pod2man -c "" -r "" $SOURCE $TARGET',
+                  suffix = '.1',
+                  src_suffix = '.pod')
+
 # taken from http://scons.tigris.org/ds/viewMessage.do?dsForumId=1268&dsMessageId=2824057
 
 def VersionedSharedLibrary(env, libname, libversion, lib_objs=[], parse_flags=[]):
@@ -127,7 +131,8 @@ vars.Add(PathVariable('_includedir',
                       PathVariable.PathAccept))
 vars.Add('optflags', 'optimization flags', '')
 
-env = Environment(BUILDERS = {'GPerf': gperf},
+env = Environment(BUILDERS = {'GPerf': gperf,
+                              'Pod2Man': pod2man},
                   variables = vars)
 
 Help(vars.GenerateHelpText(env))                              
@@ -157,11 +162,18 @@ def CheckGPerf(context):
     context.Result(0)
     return 0
 
+def CheckPod2Man(context):
+    context.Message('Checking for pod2man... ')
+    ok, output = context.TryAction('pod2man --help > $TARGET 2>&1')
+    context.Result(ok)
+    return ok
+
 # Configuration:
 
 conf = Configure(env, custom_tests = {'CheckPKGConfig': CheckPKGConfig,
                                       'CheckPKG': CheckPKG,
-                                      'CheckGPerf': CheckGPerf})
+                                      'CheckGPerf': CheckGPerf,
+                                      'CheckPod2Man': CheckPod2Man})
 
 if not conf.CheckPKGConfig('0.15.0'):
     print 'pkg-config >= 0.15.0 not found.'
@@ -180,6 +192,9 @@ if not conf.CheckPKG('libpcre'):
     Exit(1)
 
 if not conf.CheckGPerf():
+    Exit(1)
+
+if not conf.CheckPod2Man():
     Exit(1)
 
 env = conf.Finish()
@@ -253,7 +268,9 @@ env.Install('${DESTDIR}${_includedir}', ['grok.h',
                                          grok_version_h])
 
 env.Install('${DESTDIR}${_datadir}/grok/patterns', 'patterns/base')
-env.Install('${DESTDIR}${_mandir}/man1', 'grok.1')
+
+grok_1 = env.Pod2Man(source = 'grok.pod')
+env.Install('${DESTDIR}${_mandir}/man1', grok_1)
 
 env.Alias('install', '${DESTDIR}${_bindir}')
 env.Alias('install', '${DESTDIR}${_includedir}')
